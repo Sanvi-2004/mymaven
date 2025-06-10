@@ -13,3 +13,224 @@ steps:
 
   - script: java -jar target/ mymaven-0.0.1-SNAPSHOT.jar
     displayName: 'Run a jar file of My HelloMaven App'
+
+<build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>3.4.2</version>
+        <configuration>
+          <archive>
+            <index>true</index>
+            <manifest>
+              <addClasspath>true</addClasspath>
+              <mainClass>com.sanvi.HelloMaven1.App</mainClass>
+            </manifest>
+            <manifestEntries>
+              <mode>development</mode>
+              <url>${project.url}</url>
+              <key>value</key>
+            </manifestEntries>
+          </archive>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>
+
+
+tasks.withType<Jar> {
+    manifest {
+        attributes["Main-Class"] = "org.example.App"
+    }
+}
+
+tasks.jar{
+	manifest{
+	attributes["Main-Class"] = "org.example.App"
+     }
+	duplicatesStrategy=DuplicatesStrategy.EXCLUDE
+
+	from({
+	  configurations.runtimeClasspath.get().filter { it.name.endsWith("jar") }.map { zipTree(it) }
+	 })
+}
+
+pipeline {
+agent any
+tools {
+maven ' Maven' //Ensure name matches with configured
+}
+stages {
+stage('Checkout') { 
+steps {
+git branch: 'master', url: 
+'https://github.com/mtechkiran/SimpleCalci.git'
+}
+}
+stage('Build') {
+steps {
+sh 'mvn clean package'
+}
+}
+stage('Test') {
+steps {
+sh 'mvn test'
+}
+}
+stage('Run Application') { 
+steps {
+sh 'java –jar target/SimpleCalci-0.0.1-SNAPSHOT.jar'
+}
+}
+}
+}
+
+import java.util.Scanner;
+
+public class SimpleCalculator {
+    
+    // Addition
+    public static double add(double a, double b) {
+        return a + b;
+    }
+
+    // Subtraction
+    public static double subtract(double a, double b) {
+        return a - b;
+    }
+
+    // Multiplication
+    public static double multiply(double a, double b) {
+        return a * b;
+    }
+
+    // Division
+    public static double divide(double a, double b) {
+        if (b == 0) {
+            throw new ArithmeticException("Cannot divide by zero.");
+        }
+        return a / b;
+    }
+
+    // Main method
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.print("Enter first number: ");
+        double num1 = scanner.nextDouble();
+
+        System.out.print("Enter second number: ");
+        double num2 = scanner.nextDouble();
+
+        System.out.println("Choose operation: +  -  *  /");
+        char operator = scanner.next().charAt(0);
+
+        double result;
+
+        try {
+            switch (operator) {
+                case '+':
+                    result = add(num1, num2);
+                    break;
+                case '-':
+                    result = subtract(num1, num2);
+                    break;
+                case '*':
+                    result = multiply(num1, num2);
+                    break;
+                case '/':
+                    result = divide(num1, num2);
+                    break;
+                default:
+
+
+
+                    System.out.println("Invalid operator!");
+                    scanner.close();
+                    return;
+            }
+            System.out.println("Result: " + result);
+        } catch (ArithmeticException e) {
+            System.out.println("Error: " + e.getMessage());
+
+        }
+
+        scanner.close();
+    }
+}
+
+test
+
+import org.junit.Test;
+import static org.junit.Assert.*;
+
+public class SimpleCalculatorTest {
+
+    @Test
+    public void testAddition() {
+        assertEquals(15.0, SimpleCalculator.add(10, 5), 0.0001);
+    }
+
+    @Test
+    public void testSubtraction() {
+        assertEquals(5.0, SimpleCalculator.subtract(10, 5), 0.0001);
+    }
+
+    @Test
+    public void testMultiplication() {
+        assertEquals(50.0, SimpleCalculator.multiply(10, 5), 0.0001);
+    }
+
+    @Test
+    public void testDivision() {
+        assertEquals(2.0, SimpleCalculator.divide(10, 5), 0.0001);
+    }
+
+    @Test(expected = ArithmeticException.class)
+    public void testDivideByZero() {
+        SimpleCalculator.divide(10, 0);
+    }
+}
+
+
+public class GCD {
+    // Recursive Euclidean algorithm to find GCD
+    public static int computeGCD(int a, int b) {
+        if (b == 0)
+            return a;
+        return computeGCD(b, a % b);
+    }
+
+    // Main method for manual input
+    public static void main(String[] args) {
+        int a = 56;
+        int b = 98;
+        int result = computeGCD(a, b);
+        System.out.println("GCD of " + a + " and " + b + " is: " + result);
+    }
+}
+
+
+test
+
+public class GCDTest {
+    public static void main(String[] args) {
+        testGCD(56, 98, 14);
+        testGCD(101, 103, 1);
+        testGCD(48, 180, 12);
+        testGCD(0, 5, 5);
+        testGCD(5, 0, 5);
+        testGCD(0, 0, 0);  // Special case
+    }
+
+    public static void testGCD(int a, int b, int expected) {
+        int result = GCD.computeGCD(a, b);
+        if (result == expected) {
+            System.out.println("PASS: GCD(" + a + ", " + b + ") = " + result);
+        } else {
+            System.out.println("FAIL: GCD(" + a + ", " + b + ") = " + result + ", expected: " + expected);
+        }
+    }
+}
